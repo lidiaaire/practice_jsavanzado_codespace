@@ -28,3 +28,28 @@ function setButtons(layout) {
   btnGrid.setAttribute("aria-pressed", String(layout === "grid"));
   btnList.setAttribute("aria-pressed", String(layout === "list"));
 }
+
+function poster(src) {
+  const i = document.createElement("img");
+  i.src = src;
+  return i;
+}
+function title(t) {
+  return el("div", "movie-title", t);
+}
+function data(r, y) {
+  return el("div", "movie-data", `Rating: ${r} | ${y}`);
+}
+
+function Card(m) {
+  const a = el("article", "movie-card");
+  a.append(poster(m.poster), title(m.title), data(m.rating, m.year));
+  return a;
+}
+function Row(m) {
+  const a = el("article", "movie-row");
+  const box = el("div");
+  box.append(title(m.title), data(m.rating, m.year));
+  a.append(poster(m.poster), box);
+  return a;
+}
