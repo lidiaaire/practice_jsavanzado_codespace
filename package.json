@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "webpack serve",
     "build": "webpack",
-    "autopush": "chokidar \"**/*\" -i \"node_modules/**\" -i \".git/**\" -i \"dist/**\" -c \"git add -A && git commit -m \\\"auto: cambios\\\" && git push || echo Sin cambios para commitear\""
+    "autopush": "chokidar \"**/*\" -i \"node_modules/**\" -i \".git/**\" -i \"dist/**\" -c \"git add -A && git commit -m auto-cambios && git push || echo Sin cambios para commitear\""
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
