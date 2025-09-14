@@ -53,3 +53,52 @@ function Row(m) {
   a.append(poster(m.poster), box);
   return a;
 }
+
+const movies = [
+  {
+    title: "The Dark Knight",
+    year: 2008,
+    rating: 9,
+    poster: "http://image.tmdb.org/t/p/w500//qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+  },
+  {
+    title: "Inception",
+    year: 2010,
+    rating: 8.8,
+    poster: "http://image.tmdb.org/t/p/w500//edv5CZvWj09upOsy2Y6IwDhK8bt.jpg",
+  },
+  {
+    title: "Interstellar",
+    year: 2014,
+    rating: 8.6,
+    poster: "http://image.tmdb.org/t/p/w500//rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+  },
+  {
+    title: "Mad Max: Fury Road",
+    year: 2015,
+    rating: 8.1,
+    poster: "http://image.tmdb.org/t/p/w500//8tZYtuWezp8JbcsvHYO0O46tFbo.jpg",
+  },
+];
+
+function render(layout = "grid") {
+  root.classList.toggle("grid", layout === "grid");
+  root.classList.toggle("list", layout === "list");
+  root.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  for (const m of movies) frag.append(layout === "grid" ? Card(m) : Row(m));
+  root.append(frag);
+}
+
+btnGrid.addEventListener("click", () => {
+  render("grid");
+  setButtons("grid");
+});
+btnList.addEventListener("click", () => {
+  render("list");
+  setButtons("list");
+});
+
+// inicio
+render("grid");
+setButtons("grid");
