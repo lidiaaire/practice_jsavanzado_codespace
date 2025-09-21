@@ -1,104 +1,84 @@
-// Catalogo Basico + Cambio grid/list
+// Practica 1: Catálogo de películas con dos vistas (grid y list)
+// ------------------------------------------
 
-// helpers sencillos tipo ejemplo
-const el = (tag, className, text) => {
-  const n = document.createElement(tag);
-  if (className) n.className = className;
-  if (text) n.textContent = text;
-  return n;
-};
+// Importamos los datos (películas estáticas) y los estilos SCSS.
 
-const header = document.getElementById("app-header");
+import { movies } from "../movies.js";
+import "../../scss/movie.scss";
+
+// Seleccionamos el DOM
+// - root → contenedor donde se renderizan las películas
+// - btnGrid y btnList → botones para alternar la vista
+
 const root = document.getElementById("root");
+const btnGrid = document.getElementById("btn-grid");
+const btnList = document.getElementById("btn-list");
 
-// crea botones
-const btnGrid = el("button", "", "Cuadrícula");
-btnGrid.id = "btnGrid";
-btnGrid.setAttribute("aria-pressed", "true");
+// Constante con el nombre de la clave de localStorage
+// Esto nos permite guardar cuál fue la última vista seleccionada
+// y recuperarla al volver a cargar la página.
 
-const btnList = el("button", "", "Lista");
-btnList.id = "btnList";
-btnList.setAttribute("aria-pressed", "false");
+const VIEW_KEY = "catalog:view";
 
-// pinta en header
-header.append(btnGrid, btnList);
+// Funcion que se encarga de:
+// Cambiar la clase del contenedor
+// Guardar la vista de localStorage
+// Llamar a renderMovies para que pinte las peliculas
 
-// utilidad para marcar el botón activo
-function setButtons(layout) {
-  btnGrid.setAttribute("aria-pressed", String(layout === "grid"));
-  btnList.setAttribute("aria-pressed", String(layout === "list"));
+function applyView(view) {
+  // Si la vista es "grid" → añade la clase grid y quita list.
+  // Si la vista es "list" → hace lo contrario.
+
+  root.classList.toggle("grid", view === "grid");
+  root.classList.toggle("list", view === "list");
+
+  // Guardamos la vista actual en localStorage para recordarla al recargar
+
+  localStorage.setItem(VIEW_KEY, view);
+
+  // es la función que realmente pinta las películas
+  // en el contenedor, una por una, con el layout que le indiquemos (grid o list).
+
+  renderMovies(movies, view);
 }
 
-function poster(src) {
-  const i = document.createElement("img");
-  i.src = src;
-  return i;
-}
-function title(t) {
-  return el("div", "movie-title", t);
-}
-function data(r, y) {
-  return el("div", "movie-data", `Rating: ${r} | ${y}`);
-}
+// Una vez que tenemos applyView (view)
+// Creamos renderMovies en una funcion para:
+// Construir las tarjetas de las peliculas y borra lo que hubiera antes
 
-function Card(m) {
-  const a = el("article", "movie-card");
-  a.append(poster(m.poster), title(m.title), data(m.rating, m.year));
-  return a;
-}
-function Row(m) {
-  const a = el("article", "movie-row");
-  const box = el("div");
-  box.append(title(m.title), data(m.rating, m.year));
-  a.append(poster(m.poster), box);
-  return a;
-}
-
-const movies = [
-  {
-    title: "The Dark Knight",
-    year: 2008,
-    rating: 9,
-    poster: "http://image.tmdb.org/t/p/w500//qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-  },
-  {
-    title: "Inception",
-    year: 2010,
-    rating: 8.8,
-    poster: "http://image.tmdb.org/t/p/w500//edv5CZvWj09upOsy2Y6IwDhK8bt.jpg",
-  },
-  {
-    title: "Interstellar",
-    year: 2014,
-    rating: 8.6,
-    poster: "http://image.tmdb.org/t/p/w500//rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-  },
-  {
-    title: "Mad Max: Fury Road",
-    year: 2015,
-    rating: 8.1,
-    poster: "http://image.tmdb.org/t/p/w500//8tZYtuWezp8JbcsvHYO0O46tFbo.jpg",
-  },
-];
-
-function render(layout = "grid") {
-  root.classList.toggle("grid", layout === "grid");
-  root.classList.toggle("list", layout === "list");
+function renderMovies(list, view = "grid") {
   root.innerHTML = "";
-  const frag = document.createDocumentFragment();
-  for (const m of movies) frag.append(layout === "grid" ? Card(m) : Row(m));
-  root.append(frag);
+  list.forEach((m) => {
+    const article = document.createElement("article");
+    article.className = "movie";
+    article.dataset.id = m.id;
+
+    // Plantilla HTML de cada tarjeta
+
+    article.innerHTML = `
+      <img class="movie__poster"
+           src="${m.poster}"
+           alt="Poster de ${m.title}"
+           loading="lazy"
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/780x1170?text=No+image';">
+      <div class="movie__body">
+        <h3 class="movie__title">${m.title}</h3>
+        <p class="movie__meta"><strong>Rating:</strong> ${m.rating} · ${m.year}</p>
+      </div>
+    `;
+    root.appendChild(article);
+  });
 }
 
-btnGrid.addEventListener("click", () => {
-  render("grid");
-  setButtons("grid");
-});
-btnList.addEventListener("click", () => {
-  render("list");
-  setButtons("list");
-});
+// listeners
 
-// inicio
-render("grid");
-setButtons("grid");
+btnGrid.addEventListener("click", () => applyView("grid"));
+btnList.addEventListener("click", () => applyView("list"));
+
+// inicial: desde localStorage o grid
+
+applyView(localStorage.getItem(VIEW_KEY) || "grid");
+
+// En resumen:
+// applyView --> Decide la vista y ordena el trabajo
+// RenderMovies --> Ejecuta el trabajo pintando las peliculas

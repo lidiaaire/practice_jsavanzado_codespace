@@ -1,5 +1,5 @@
 // Agregador
 
-@import "./base.scss";
-@import "./HeaderFooter.scss";
-@import "./movie.scss";
+@use "./base" as *;
+@use "./HeaderFooter" as *;
+@use "./movie" as *;
