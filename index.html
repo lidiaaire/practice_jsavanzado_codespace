@@ -6,13 +6,82 @@
     <title>Práctica JS Avanzado</title>
   </head>
   <body>
-    <header id="app-header">
-      <button id="btn-grid">Grid</button>
-      <button id="btn-list">Lista</button>
+    <header class="site-header">
+      <div class="container header__inner">
+        <a class="logo" href="/">FILMAX</a>
+
+        <nav class="main-nav" aria-label="Menú principal">
+          <a class="nav-link active" href="#">HOME</a
+          ><span class="nav-sep">/</span>
+          <a class="nav-link" href="#">FEATURES</a
+          ><span class="nav-sep">/</span> <a class="nav-link" href="#">ABOUT</a
+          ><span class="nav-sep">/</span> <a class="nav-link" href="#">NEWS</a
+          ><span class="nav-sep">/</span>
+          <a class="nav-link" href="#">CONTACTS</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="icon-btn" aria-label="Buscar" title="Buscar">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path
+                d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10.7.7l.3.3v.8L20 21.5 21.5 20 15.5 14zM10 15a5 5 0 110-10 5 5 0 010 10z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+          <span class="v-sep" aria-hidden="true"></span>
+          <a class="icon-btn" href="#" aria-label="X" title="X">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M20 4l-7.2 8.4L20.8 20h-3.1l-5.3-5.6-4.7 5.6H3.2l7.5-8.9L3 4h3.1l5 5.3L15.6 4H20z"
+              />
+            </svg>
+          </a>
+          <a class="icon-btn" href="#" aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                fill="currentColor"
+                d="M13 22v-9h3l.5-3H13V8.2C13 7.4 13.2 7 14.4 7H16V4.1C15.4 4 14.6 4 13.7 4 11.5 4 10 5.4 10 7.9V10H7v3h3v9h3z"
+              />
+            </svg>
+          </a>
+          <a class="icon-btn" href="#" aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                fill="currentColor"
+                d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 5.5A4.5 4.5 0 1112 16a4.5 4.5 0 010-9zm5-2.8a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+              />
+            </svg>
+          </a>
+          <a class="icon-btn" href="#" aria-label="YouTube" title="YouTube">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                fill="currentColor"
+                d="M23 12s0-3.3-.4-4.9c-.2-.9-1-1.6-1.9-1.8C18.7 4 12 4 12 4S5.3 4 3.3 4.3c-.9.2-1.7.9-1.9 1.8C1 8.7 1 12 1 12s0 3.3.4 4.9c.2.9 1 1.6 1.9 1.8C5.3 20 12 20 12 20s6.7 0 8.7-.3c.9-.2 1.7-.9 1.9-1.8.4-1.6.4-4.9.4-4.9zM10 15.5v-7l6 3.5-6 3.5z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <section id="root" class="grid"></section>
+    <section class="hero">
+      <div class="container hero__inner">
+        <h1 class="hero-title">Catalogo</h1>
+        <div class="view-switch">
+          <button id="btn-grid" class="view-switch__btn" aria-pressed="true">
+            Cuadrícula
+          </button>
+          <button id="btn-list" class="view-switch__btn" aria-pressed="false">
+            Lista
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <main class="container">
+      <div id="root" class="catalog grid"></div>
     </main>
   </body>
 </html>

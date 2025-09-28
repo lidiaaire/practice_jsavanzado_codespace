@@ -1,72 +1,168 @@
-// Catalogo. Estilos que cambian segun el layout (grid/list) y la tarjeta de la pelicula
-
-#root {
-  padding: 1rem;
+/* Layout base */
+:root {
+  --bg: #0f1115;
+  --fg: #e9edf1;
+  --muted: #9aa3ad;
+  --card: #151922;
+  --accent: #d4aa4a; /* toque dorado tipo “cine” */
 }
 
-#root.grid {
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Contenedores */
+.container {
+  width: min(1200px, 92vw);
+  margin: 0 auto;
+}
+
+/* Header estilo Filmax */
+.site-header {
+  background: #0b0d11;
+  border-bottom: 1px solid #1c2230;
+}
+.site-header .container {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.9rem 0;
+}
+.logo {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fg);
+}
+.main-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 1.2rem;
+}
+.main-nav a {
+  color: var(--fg);
+  text-decoration: none;
+  opacity: 0.9;
+}
+.main-nav a:hover {
+  opacity: 1;
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(180deg, #111623, #0f1115);
+  padding: 2.2rem 0 1.4rem;
+  border-bottom: 1px solid #1c2230;
+}
+.hero__inner {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.hero__title {
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  font-weight: 800;
+}
+
+/* Toggle vista */
+.view-switch {
+  display: flex;
+  gap: 0.5rem;
+}
+.view-switch__btn {
+  border: 1px solid #1f2634;
+  background: #111827;
+  color: var(--fg);
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+.view-switch__btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(212, 170, 74, 0.15) inset;
+}
+
+/* Catálogo */
+.catalog.grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(2, 1fr); /* móvil */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-
-@media (min-width: 768px) {
-  #root.grid {
+@media (max-width: 1100px) {
+  .catalog.grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-
-@media (min-width: 1200px) {
-  #root.grid {
-    grid-template-columns: repeat(4, 1fr);
-  } /* fijo 4 en desktop */
+@media (max-width: 760px) {
+  .catalog.grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 460px) {
+  .catalog.grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-#root.list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
+.catalog.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
+/* Tarjeta */
 .movie {
-  background: #0f172a;
-  color: #e2e8f0;
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: var(--card);
+  border: 1px solid #1c2230;
+  border-radius: 14px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
-
-#root.list .movie {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  align-items: center;
+.movie:hover {
+  transform: translateY(-2px);
+  border-color: #273149;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .movie__poster {
-  display: block;
   width: 100%;
-  height: 260px;
+  aspect-ratio: 2/3;
   object-fit: cover;
+  display: block;
 }
-
-#root.list .movie__poster {
-  height: 100%;
-  max-height: 140px;
-}
-
 .movie__body {
-  padding: 0.9rem 1rem 1rem;
+  padding: 0.8rem 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
-
 .movie__title {
-  margin: 0 0 0.35rem;
-  font-size: 1.05rem;
-  line-height: 1.25;
   font-weight: 700;
+  line-height: 1.2;
+}
+.movie__meta {
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 
-.movie__meta {
-  margin: 0;
-  opacity: 0.85;
-  font-size: 0.9rem;
+/* Variante lista */
+.catalog.list .movie {
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0.6rem;
+}
+.catalog.list .movie__poster {
+  width: 108px;
+  border-radius: 10px;
+  aspect-ratio: auto;
+}
+.catalog.list .movie__body {
+  padding: 0.2rem 0.8rem;
 }
