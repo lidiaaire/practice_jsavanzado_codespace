@@ -1,16 +1,17 @@
 {
   "name": "practice_jsavanzado_codespace",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "webpack serve --open",
-    "dev:tmdb": "cross-env TMDB_TOKEN=EY_JWT_AQUI webpack serve --open",
+    "dev:tmdb": "cross-env TMDB_TOKEN=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhM2VkMTRiYTA2MGNkODI5OGYyZmM3NGJkNDBmOWYwNiIsIm5iZiI6MTc1NzI2Nzc3OC4wODQsInN1YiI6IjY4YmRjNzQyM2MyYjE2MmJhMjFmNTFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.AesW6OqgZVdnnpqq7E3JMsOi0JAGTHdIoNoryV8Ameo TMDB_API_KEY=a3ed14ba060cd8298f2fc74bd40f9f06 webpack serve --open",
     "build": "webpack",
     "autopush": "chokidar \"**/*\" -i \"node_modules/**\" -i \".git/**\" -i \"dist/**\" -c \"git add -A && git commit -m auto-cambios && git push || echo Sin cambios para commitear\""
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^12.0.2",
+    "cross-env": "^7.0.3",
     "chokidar-cli": "^3.0.0",
-    "copy-webpack-plugin": "^13.0.1",
-    "cross-env": "^10.0.0",
     "css-loader": "^7.1.2",
     "html-webpack-plugin": "^5.6.4",
     "sass": "^1.92.1",

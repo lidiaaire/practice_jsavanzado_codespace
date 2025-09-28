@@ -1,149 +1,75 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PRACTICE JS AVANZADO</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catálogo Filmax</title>
   </head>
   <body>
-    <!-- HEADER -->
     <header class="header">
-      <!-- LOGO FILMAX -->
-      <div>
-        <!-- Usa esta ruta si copiaste assets a /asset; si no, cambia a tu ruta -->
-        <img src="asset/images/logo-1x.png" alt="FILMAX" class="logo" />
-      </div>
-
-      <!-- MENÚ PRINCIPAL -->
-      <nav class="menu" aria-label="Menú principal">
-        <ul>
-          <li><a href="#" class="active">HOME</a></li>
-          <li class="separator">/</li>
-          <li><a href="#">FEATURES</a></li>
-          <li class="separator">/</li>
-          <li><a href="#">ABOUT</a></li>
-          <li class="separator">/</li>
-          <li><a href="#">NEWS</a></li>
-          <li class="separator">/</li>
-          <li><a href="#">CONTACTS</a></li>
-        </ul>
-      </nav>
-
-      <!-- ICONOS DERECHA -->
-      <div class="icons">
-        <div class="search">
-          <button class="icon outlined" aria-label="Buscar">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="32"
-              viewBox="0 -960 960 960"
-              width="32"
-              aria-hidden="true"
-            >
-              <path
-                d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
-              />
-            </svg>
-          </button>
-        </div>
-        <span class="separator" aria-hidden="true"></span>
-        <nav class="RS" aria-label="Redes sociales">
-          <ul>
-            <li>
-              <a href="#" aria-label="X">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 36 36"
-                  width="36"
-                  height="36"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M 6 4 C 4.895 4 4 4.895 4 6 L 4 24 C 4 25.105 4.895 26 6 26 L 24 26 C 25.105 26 26 25.105 26 24 L 26 6 C 26 4.895 25.105 4 24 4 L 6 4 z M 8.6484375 9 L 13.259766 9 L 15.951172 12.847656 L 19.28125 9 L 20.732422 9 L 16.603516 13.78125 L 21.654297 21 L 17.042969 21 L 14.056641 16.730469 L 10.369141 21 L 8.8945312 21 L 13.400391 15.794922 L 8.6484375 9 z"
-                  />
-                </svg>
-              </a>
-            </li>
-            <li>
-              <a href="#" aria-label="Facebook">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 36 36"
-                  width="36"
-                  height="36"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M15,3C8.373,3,3,8.373,3,15c0,6.016,4.432,10.984,10.206,11.852V18.18h-2.969v-3.154h2.969v-2.099c0-3.475,1.693-5,4.581-5 c1.383,0,2.115,0.103,2.461,0.149v2.753h-1.97c-1.226,0-1.654,1.163-1.654,2.473v1.724h3.593L19.73,18.18h-3.106v8.697 C22.481,26.083,27,21.075,27,15C27,8.373,21.627,3,15,3z"
-                  />
-                </svg>
-              </a>
-            </li>
-            <li>
-              <a href="#" aria-label="Instagram">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 36 36"
-                  width="36"
-                  height="36"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M 11.46875 5 C 7.917969 5 5 7.914063 5 11.46875 L 5 20.53125 C 5 24.082031 7.914063 27 11.46875 27 L 20.53125 27 C 24.082031 27 27 24.085938 27 20.53125 L 27 11.46875 C 27 7.917969 24.085938 5 20.53125 5 Z M 21.90625 9.1875 C 21.402344 9.1875 21 9.589844 21 10.09375 C 21 10.597656 21.402344 11 21.90625 11 C 22.410156 11 22.8125 10.597656 22.8125 10.09375 C 22.8125 9.589844 22.410156 9.1875 21.90625 9.1875 Z M 16 10 C 12.699219 10 10 12.699219 10 16 C 10 19.300781 12.699219 22 16 22 C 19.300781 22 22 19.300781 22 16 C 22 12.699219 19.300781 10 16 10 Z"
-                  />
-                </svg>
-              </a>
-            </li>
-            <li>
-              <a href="#" aria-label="YouTube">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 36 36"
-                  width="36"
-                  height="36"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M 5.6796875 2 L 7.1582031 7.34375 L 7.1582031 9.90625 L 8.4394531 9.90625 L 8.4394531 7.34375 L 9.9375 2 L 8.6464844 2 L 8.109375 4.4316406 C 7.958375 5.1416406 7.8623594 5.6462656 7.8183594 5.9472656 L 7.7792969 5.9472656 C 7.7162969 5.5262656 7.6202813 5.017875 7.4882812 4.421875 L 6.9707031 2 L 5.6796875 2 z M 11.431641 4.0175781 C 10.997641 4.0175781 10.647859 4.1023906 10.380859 4.2753906 C 10.113859 4.4473906 9.9170156 4.7226094 9.7910156 5.0996094 C 9.6660156 5.4766094 9.6035156 5.9756563 9.6035156 6.5976562 L 9.6035156 7.4375 C 9.6035156 8.0525 9.6575781 8.5450156 9.7675781 8.9160156 C 9.8775781 9.2870156 10.063219 9.5603281 10.324219 9.7363281 C 10.585219 9.9123281 10.944344 10 11.402344 10 C 11.848344 10 12.202891 9.9132344 12.462891 9.7402344 C 12.722891 9.5672344 12.911344 9.295875 13.027344 8.921875 C 13.143344 8.547875 13.201172 8.0535 13.201172 7.4375 L 13.201172 6.5976562 C 13.201172 5.9766562 13.142437 5.4794687 13.023438 5.1054688 C 12.904438 4.7324687 12.715031 4.45725 12.457031 4.28125 C 12.199031 4.10525 11.858641 4.0175781 11.431641 4.0175781 z"
-                  />
-                </svg>
-              </a>
-            </li>
+      <div class="container header__inner">
+        <a href="#" class="logo">
+          <img class="logo" alt="Filmax logo" />
+        </a>
+        <nav class="nav">
+          <ul class="nav__list">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#">Contacts</a></li>
           </ul>
         </nav>
+        <div class="header__actions">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
       </div>
     </header>
 
-    <!-- Barra mínima para botones de vista (sin título "Catalogo") -->
-    <section class="toolbar">
-      <div class="container">
+    <!-- Hero con selector centrado e iconos a la derecha -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div></div>
+        <div class="hero__center">
+          <span class="hero__label">Seleccione una categoría:</span>
+          <select id="genre-select" class="hero__select"></select>
+        </div>
         <div class="view-switch">
-          <button id="btn-grid" class="view-switch__btn" aria-pressed="true">
-            Cuadrícula
+          <button
+            id="btn-grid"
+            class="iconbtn"
+            aria-pressed="true"
+            title="Cuadrícula"
+            type="button"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
           </button>
-          <button id="btn-list" class="view-switch__btn" aria-pressed="false">
-            Lista
+          <button
+            id="btn-list"
+            class="iconbtn"
+            aria-pressed="false"
+            title="Lista"
+            type="button"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <rect x="3" y="4" width="18" height="3" rx="1" />
+              <rect x="3" y="10.5" width="18" height="3" rx="1" />
+              <rect x="3" y="17" width="18" height="3" rx="1" />
+            </svg>
           </button>
         </div>
       </div>
     </section>
-    <!-- BARRA DE CATEGORÍA -->
-    <section class="filterbar">
-      <div class="container filterbar__inner">
-        <p class="filterbar__label">
-          Seleccione una categoría:
-          <span id="genre-label" class="filterbar__current">Todas</span>
-        </p>
-        <select
-          id="genre-select"
-          class="filterbar__select"
-          aria-label="Selecciona categoría"
-        ></select>
-      </div>
-    </section>
 
-    <!-- CATÁLOGO -->
-    <main class="container">
+    <!-- Catálogo -->
+    <main>
       <div id="root" class="catalog grid"></div>
     </main>
   </body>

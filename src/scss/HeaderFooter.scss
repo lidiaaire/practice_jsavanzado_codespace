@@ -19,9 +19,9 @@
 }
 
 /* Logo: <img class="logo"> o <div class="logo"><img> */
-.header .logo,
-.header .logo img {
-  max-height: 30px; /* puedes subirlo si quieres */
+.logo img,
+img.logo {
+  max-height: 30px;
   width: auto;
   display: block;
 }
@@ -73,21 +73,32 @@
   transform: scaleX(1);
   transform-origin: bottom left;
 }
-
-/* ===== ICONOS DERECHA ===== */
 .icons {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--header-color);
+  color: #fff;
 }
-
-/* Separador vertical a la altura del texto */
 .icons .separator {
   width: 1px;
-  height: var(--header-font-size);
+  height: 12px;
   background: rgba(255, 255, 255, 0.35);
   display: inline-block;
+}
+.RS ul {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.RS a {
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+}
+.RS a:hover {
+  color: red;
 }
 
 /* Lupa plana, mismo tamaño que el texto */

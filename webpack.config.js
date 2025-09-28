@@ -13,9 +13,7 @@ module.exports = {
   },
   module: {
     rules: [
-      // SCSS/CSS
       { test: /\.s?css$/i, use: ["style-loader", "css-loader", "sass-loader"] },
-      // Imágenes
       { test: /\.(png|jpe?g|gif|svg|webp)$/i, type: "asset/resource" },
     ],
   },
@@ -30,7 +28,7 @@ module.exports = {
       ),
     }),
 
-    // Copia assets estáticos (para usar rutas tipo asset/images/… directamente en el HTML)
+    // Copia assets a dist/asset para usarlos directo en el HTML
     new CopyWebpackPlugin({
       patterns: [{ from: "src/asset", to: "asset" }],
     }),
@@ -39,8 +37,6 @@ module.exports = {
     port: 8080,
     open: true,
     hot: true,
-    static: {
-      directory: path.join(__dirname, "public"), // opcional si tienes carpeta public
-    },
+    static: { directory: path.join(__dirname, "public") }, // opcional
   },
 };
