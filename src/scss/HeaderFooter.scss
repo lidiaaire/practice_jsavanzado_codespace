@@ -1,6 +1,9 @@
-/* ======= Tamaño base del header ======= */
+/* ======= Tamaño base del header / colores ======= */
 :root {
   --header-font-size: 12px;
+  --header-color: #fff;
+  --header-bg: #1a1d24;
+  --accent: #cc2942; /* rojo filmax */
 }
 
 /* ===== HEADER ===== */
@@ -8,17 +11,26 @@
   position: sticky;
   top: 0;
   z-index: 999;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 84px;
-  padding: 10px 454px;
-  background-color: #1a1d24;
+  background-color: var(--header-bg);
   color: var(--header-color);
   font-family: "Roboto Condensed", sans-serif;
+
+  /* alineación */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centramos el .container */
+  height: 84px;
 }
 
-/* Logo: <img class="logo"> o <div class="logo"><img> */
+.header > .container {
+  width: min(1200px, 92vw);
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo izq, iconos dcha */
+  padding: 0 24px;
+}
+
+/* Logo: <a class="logo"><img> */
 .logo img,
 img.logo {
   max-height: 30px;
@@ -26,23 +38,31 @@ img.logo {
   display: block;
 }
 
-/* ===== MENÚ ===== */
+/* ===== MENÚ (centro) ===== */
+.menu {
+  flex: 1; /* ocupa el espacio central */
+  display: flex;
+  justify-content: center;
+}
+
 .menu ul {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center; /* centra el texto */
   list-style: none;
-  margin: 0 56px;
-  padding: 10px 100px;
-  gap: 8px; /* un pelín más de aire */
+  margin: 0;
+  padding: 0;
+  gap: 28px; /* espacio uniforme entre items y "/" */
 }
 
 .menu li {
-  margin: 0 2px;
-  padding: 6px 8px; /* añade 8px lateral para equilibrar */
+  margin: 0;
+  padding: 0;
   position: relative;
   font-size: var(--header-font-size);
   font-weight: 700;
   line-height: 1;
+  text-transform: uppercase;
 }
 
 .menu li.separator {
@@ -53,55 +73,88 @@ img.logo {
 .menu ul li a {
   color: var(--header-color);
   text-decoration: none;
+  position: relative;
 }
 
-/* Subrayado animado */
-.menu li::after {
+/* Subrayado (activo/hover) */
+.menu ul li a.active::after,
+.menu ul li a:hover::after {
   content: "";
   position: absolute;
-  bottom: -3px;
-  top: 27px;
   left: 0;
-  width: 95%;
-  height: 1px;
-  background-color: #cc2942; /* rojo filmax */
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  transition: transform 0.3s ease-out;
+  bottom: -6px;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent);
 }
-.menu li:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
-}
+
+/* ===== ICONOS DERECHA ===== */
 .icons {
   display: flex;
   align-items: center;
   gap: 12px;
   color: #fff;
 }
+
 .icons .separator {
   width: 1px;
-  height: 12px;
+  height: 14px;
   background: rgba(255, 255, 255, 0.35);
   display: inline-block;
 }
-.RS ul {
-  display: flex;
-  gap: 12px;
-  margin: 0;
+
+/* Botón/liga de icono sin fondo */
+.icons button,
+.icons a {
+  background: transparent;
+  border: 0;
   padding: 0;
-  list-style: none;
-}
-.RS a {
   display: inline-flex;
   align-items: center;
-  color: #fff;
-}
-.RS a:hover {
-  color: red;
+  color: var(--header-color);
+  cursor: pointer;
 }
 
-/* Lupa plana, mismo tamaño que el texto */
+.icons button:hover,
+.icons a:hover {
+  color: var(--accent);
+}
+
+/* Tamaño de los SVG de iconos */
+.icons svg,
+.RS ul li a svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* ===== Redes sociales ===== */
+.RS ul,
+.RS ul li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.RS ul {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--header-color);
+}
+
+.RS ul li a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--header-color);
+}
+
+.RS ul li a:hover {
+  color: var(--accent);
+}
+
+/* ===== Lupa (si usas .search .icon) ===== */
 .header .search button.icon {
   background: transparent !important;
   border: 0 !important;
@@ -116,36 +169,4 @@ img.logo {
   width: var(--header-font-size);
   height: var(--header-font-size);
   fill: currentColor;
-}
-
-/* Redes sin bullets y mismo tamaño que el texto */
-.RS ul,
-.RS ul li {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.RS ul {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--header-color);
-}
-.RS ul li a {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--header-color);
-}
-.RS ul li a svg {
-  width: var(--header-font-size);
-  height: var(--header-font-size);
-  fill: currentColor;
-}
-
-/* Hover rojo */
-.header .search button.icon:hover,
-.RS ul li a:hover {
-  color: #cc2942;
-  cursor: pointer;
 }

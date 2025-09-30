@@ -3,6 +3,8 @@
 
 import { movies } from "./movies.js";
 console.log(movies);
+import logoUrl from "../asset/images/logo-1x.png";
+document.querySelector(".logo img").src = logoUrl;
 
 import "./practice/practice1.js";
 import "./utils/dom.js";
