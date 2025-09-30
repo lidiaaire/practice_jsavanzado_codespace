@@ -1,138 +1,146 @@
-// src/js/practice/practice1.js
-console.log("[BOOT] TMDB_TOKEN set?", !!process.env.TMDB_TOKEN);
-console.log("[BOOT] TMDB_API_KEY set?", !!process.env.TMDB_API_KEY);
+// Practica 1: Catálogo de películas con dos vistas (grid y list)
+// ------------------------------------------
 
-const API_TOKEN = process.env.TMDB_TOKEN;
-const API_KEY = process.env.TMDB_API_KEY;
-const BASE_URL = "https://api.themoviedb.org/3";
+// Importamos los datos (películas estáticas) y los estilos SCSS.
+// -------------------------------------------------------------
 
-let movies = [];
-let genres = [];
-let currentView = "grid";
+import { movies } from "../movies.js";
+import "../../scss/movie.scss";
 
-const catalogEl = document.getElementById("catalog");
-const genreSelect = document.getElementById("genre-select");
+// Seleccionamos el DOM
+// - root → contenedor donde se renderizan las películas
+// - btnGrid y btnList → botones para alternar la vista
+
+// DOM
+const root = document.getElementById("root");
 const btnGrid = document.getElementById("btn-grid");
 const btnList = document.getElementById("btn-list");
 
-// Render de películas
-function renderMovies(list) {
-  if (!catalogEl) return;
-  catalogEl.innerHTML = "";
-  list.forEach((m) => {
-    const card = document.createElement("div");
-    card.className = "movie";
+// Constante con el nombre de la clave de localStorage
+// Esto nos permite guardar cuál fue la última vista seleccionada
+// y recuperarla al volver a cargar la página.
 
-    const img = document.createElement("img");
-    img.src = m.poster_path || "https://via.placeholder.com/300x450";
-    img.alt = m.title;
-    img.className = "movie__poster";
-
-    const body = document.createElement("div");
-    body.className = "movie__body";
-
-    const h3 = document.createElement("h3");
-    h3.className = "movie__title";
-    h3.innerHTML = `${m.title} <span class="movie__meta">(${m.year}) ★ ${m.rating}</span>`;
-
-    const summary = document.createElement("p");
-    summary.className = "movie__summary";
-    summary.textContent = m.overview || "Sinopsis no disponible.";
-
-    const info = document.createElement("div");
-    info.className = "movie__info";
-    info.innerHTML = `
-      <p><strong>Director:</strong> ${m.director || "—"}</p>
-      <p><strong>Actors:</strong> ${m.actors || "—"}</p>
-      <p><strong>Género:</strong> ${m.genre_names?.join(", ") || "—"}</p>
-    `;
-
-    body.appendChild(h3);
-    body.appendChild(summary);
-    body.appendChild(info);
-
-    card.appendChild(img);
-    card.appendChild(body);
-    catalogEl.appendChild(card);
-  });
-}
-
-// Filtro
-function getFiltered() {
-  const g = genreSelect.value;
-  if (g === "all") return movies;
-  return movies.filter((m) => m.genre_ids?.includes(parseInt(g)));
-}
-
-// Aplicar vista
-function applyView() {
-  if (!catalogEl) return;
-  catalogEl.className = `catalog ${currentView}`;
-  renderMovies(getFiltered());
-}
-
-// Handlers botones
-btnGrid?.addEventListener("click", () => {
-  currentView = "grid";
-  btnGrid.setAttribute("aria-pressed", "true");
-  btnList.setAttribute("aria-pressed", "false");
-  applyView();
-});
-btnList?.addEventListener("click", () => {
-  currentView = "list";
-  btnList.setAttribute("aria-pressed", "true");
-  btnGrid.setAttribute("aria-pressed", "false");
-  applyView();
-});
-genreSelect?.addEventListener("change", applyView);
-
-// Cargar de TMDB
+// Clave vista
+const VIEW_KEY = "a3ed14ba060cd8298f2fc74bd40f9f06";
+const TMDB_TOKEN =
+  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhM2VkMTRiYTA2MGNkODI5OGYyZmM3NGJkNDBmOWYwNiIsIm5iZiI6MTc1NzI2Nzc3OC4wODQsInN1YiI6IjY4YmRjNzQyM2MyYjE2MmJhMjFmNTFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.AesW6OqgZVdnnpqq7E3JMsOi0JAGTHdIoNoryV8Ameo";
+// Funcion que se encarga de:
+// Cambiar la clase del contenedor
+// Guardar la vista de localStorage
+// Llamar a renderMovies para que pinte las peliculas
+// ------------------ TMDB: hidrata el catálogo ------------------
 async function hydrateFromTMDB() {
-  console.log("[TMDB] iniciando fetch…");
   try {
-    const conf = await fetch(`${BASE_URL}/configuration`, {
-      headers: { Authorization: `Bearer ${API_TOKEN}` },
-    });
-    console.log("[TMDB] /configuration status:", conf.status);
+    if (!TMDB_TOKEN) throw new Error("TMDB token no configurado");
 
-    const genreRes = await fetch(
-      `${BASE_URL}/genre/movie/list?language=es-ES`,
-      { headers: { Authorization: `Bearer ${API_TOKEN}` } }
-    );
-    console.log("[TMDB] /genre status:", genreRes.status);
-    genres = (await genreRes.json()).genres || [];
+    const headers = {
+      accept: "application/json",
+      Authorization: `Bearer ${TMDB_TOKEN}`,
+    };
 
-    genreSelect.innerHTML =
-      `<option value="all">Todas</option>` +
-      genres.map((g) => `<option value="${g.id}">${g.name}</option>`).join("");
+    // configuración de imágenes
+    const cfg = await fetch("https://api.themoviedb.org/3/configuration", {
+      headers,
+    }).then((r) => r.json());
 
-    const promises = [1, 2, 3].map((page) =>
-      fetch(`${BASE_URL}/discover/movie?language=es-ES&page=${page}`, {
-        headers: { Authorization: `Bearer ${API_TOKEN}` },
-      }).then((r) => r.json())
-    );
+    const base =
+      (cfg.images && (cfg.images.secure_base_url || cfg.images.base_url)) ||
+      "https://image.tmdb.org/t/p/";
+    const size = "w342";
 
-    const results = await Promise.all(promises);
-    movies = results.flatMap((r) =>
-      r.results.map((m) => ({
-        id: m.id,
-        title: m.title,
-        poster_path: `https://image.tmdb.org/t/p/w300${m.poster_path}`,
-        overview: m.overview,
-        rating: m.vote_average.toFixed(1),
-        year: (m.release_date || "").slice(0, 4),
-        genre_ids: m.genre_ids,
-        genre_names: m.genre_ids
-          ?.map((id) => genres.find((g) => g.id === id)?.name)
-          .filter(Boolean),
-      }))
-    );
-    console.log("[TMDB] total películas cargadas:", movies.length);
+    const pages = [1, 2, 3, 4, 5];
+    const all = [];
 
-    applyView();
+    for (const p of pages) {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&include_adult=false&language=es-ES&page=${p}`,
+        { headers }
+      );
+      if (!res.ok) throw new Error(`TMDB ${res.status}`);
+      const json = await res.json();
+
+      all.push(
+        ...json.results.map((m) => ({
+          id: m.id,
+          title: m.title,
+          year: (m.release_date || "").slice(0, 4),
+          rating: (m.vote_average ?? 0).toFixed(1),
+          poster: m.poster_path ? `${base}${size}${m.poster_path}` : "",
+        }))
+      );
+    }
+
+    movies.length = 0;
+    movies.push(...all);
+
+    console.log("Películas cargadas desde TMDB:", movies.length);
   } catch (e) {
-    console.warn("No se pudo cargar TMDB. Uso catálogo estático.", e);
+    console.warn(
+      "No se pudo cargar TMDB, se usará el catálogo estático.",
+      e.message || e
+    );
   }
 }
 
-document.addEventListener("DOMContentLoaded", hydrateFromTMDB);
+// ------------------ Vista y render ------------------
+function applyView(view) {
+  // Si la vista es "grid" → añade la clase grid y quita list.
+  // Si la vista es "list" → hace lo contrario.
+
+  root.classList.toggle("grid", view === "grid");
+  root.classList.toggle("list", view === "list");
+
+  // Guardamos la vista actual en localStorage para recordarla al recargar
+
+  localStorage.setItem(VIEW_KEY, view);
+
+  // es la función que realmente pinta las películas
+  // en el contenedor, una por una, con el layout que le indiquemos (grid o list).
+
+  renderMovies(movies, view);
+}
+
+// Una vez que tenemos applyView (view)
+// Creamos renderMovies en una funcion para:
+// Construir las tarjetas de las peliculas y borra lo que hubiera antes
+
+function renderMovies(list, view = "grid") {
+  root.innerHTML = "";
+
+  list.forEach((m) => {
+    const article = document.createElement("article");
+    article.className = "movie";
+    article.dataset.id = m.id;
+
+    // Plantilla HTML de cada tarjeta
+
+    article.innerHTML = `
+      <img class="movie__poster"
+           src="${m.poster}"
+@@ -66,19 +96,17 @@ function renderMovies(list, view = "grid") {
+        <p class="movie__meta"><strong>Rating:</strong> ${m.rating} · ${m.year}</p>
+      </div>
+    `;
+
+    root.appendChild(article);
+  });
+}
+
+// listeners
+
+// ------------------ Listeners ------------------
+btnGrid.addEventListener("click", () => applyView("grid"));
+btnList.addEventListener("click", () => applyView("list"));
+
+// inicial: desde localStorage o grid
+
+applyView(localStorage.getItem(VIEW_KEY) || "grid");
+
+// En resumen:
+// applyView --> Decide la vista y ordena el trabajo
+// RenderMovies --> Ejecuta el trabajo pintando las peliculas
+// ------------------ Bootstrap ------------------
+(async function boot() {
+  await hydrateFromTMDB(); // si falla, se queda el estático
+  applyView(localStorage.getItem(VIEW_KEY) || "grid");
+})();
