@@ -1,12 +1,7 @@
-// Punto de entrada de Webpack. Aquí importas los estilos y “enciendes” la práctica que estés trabajando
-// Importaciones de módulos y archivos SCSS
-
-import { movies } from "./movies.js";
-console.log(movies);
+// src/js/main.js
+import { hydrateFromTMDB, renderCatalog, bindViewControls } from "./movies.js";
 import logoUrl from "../asset/images/logo-1x.png";
-document.querySelector(".logo img").src = logoUrl;
 
-import "./practice/practice1.js";
 import "./utils/dom.js";
 
 import "../scss/base.scss";
@@ -14,7 +9,17 @@ import "../scss/HeaderFooter.scss";
 import "../scss/movie.scss";
 import "../scss/style.scss";
 
-// en tu main.js si quieres marcar activo dinámicamente
+document.addEventListener("DOMContentLoaded", async () => {
+  const logoImg = document.querySelector(".logo img");
+  if (logoImg) logoImg.src = logoUrl;
+
+  await hydrateFromTMDB();
+  const root = document.getElementById("root");
+  renderCatalog(root);
+  bindViewControls();
+});
+
+// activar item de navegación
 document.querySelectorAll(".main-nav .nav-link").forEach((a) => {
   a.addEventListener("click", (e) => {
     document

@@ -130,13 +130,38 @@
     <!-- ===== HERO ===== -->
     <section class="hero">
       <div class="container hero__inner">
-        <h1 class="hero-title">Catalogo</h1>
-        <div class="view-switch">
-          <button id="btn-grid" class="view-switch__btn" aria-pressed="true">
-            Cuadrícula
+        <h1 class="hero__title"></h1>
+      </div>
+    </section>
+    <!-- ===== BARRA ENTRE HEADER Y CATÁLOGO ===== -->
+    <section class="catalog-toolbar">
+      <div class="container">
+        <div class="catalog-toolbar__title">
+          Seleccione una categoría:
+          <span id="category-label" class="category"></span>
+        </div>
+        <div
+          class="catalog-toolbar__controls"
+          role="group"
+          aria-label="Cambiar vista"
+        >
+          <button
+            id="btn-grid"
+            class="viewbtn"
+            aria-pressed="true"
+            title="Cuadrícula"
+            aria-label="Vista cuadrícula"
+          >
+            <i class="icon-grid"></i>
           </button>
-          <button id="btn-list" class="view-switch__btn" aria-pressed="false">
-            Lista
+          <button
+            id="btn-list"
+            class="viewbtn"
+            aria-pressed="false"
+            title="Lista"
+            aria-label="Vista lista"
+          >
+            <i class="icon-list"></i>
           </button>
         </div>
       </div>
