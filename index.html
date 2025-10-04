@@ -138,8 +138,18 @@
       <div class="container">
         <div class="catalog-toolbar__title">
           Seleccione una categoría:
-          <span id="category-label" class="category"></span>
+          <button
+            id="category-trigger"
+            class="category"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+          >
+            Populares
+          </button>
+          <!-- popover del menú -->
+          <div id="category-popover" class="category-popover" hidden></div>
         </div>
+
         <div
           class="catalog-toolbar__controls"
           role="group"
@@ -150,7 +160,6 @@
             class="viewbtn"
             aria-pressed="true"
             title="Cuadrícula"
-            aria-label="Vista cuadrícula"
           >
             <i class="icon-grid"></i>
           </button>
@@ -159,7 +168,6 @@
             class="viewbtn"
             aria-pressed="false"
             title="Lista"
-            aria-label="Vista lista"
           >
             <i class="icon-list"></i>
           </button>

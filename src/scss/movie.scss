@@ -241,9 +241,10 @@ body {
 .movie__poster {
   display: block;
   width: 100%;
-  height: 260px;
-  aspect-ratio: 2/3;
-  object-fit: cover;
+  height: auto; /* <- sin altura fija */
+  aspect-ratio: auto; /* <- usamos la del propio poster */
+  object-fit: contain; /* <- se ve entero */
+  background: #0a0d14; /* leve fondo para márgenes laterales del poster */
 }
 .movie__body {
   padding: 0.8rem 0.9rem 1rem;
@@ -313,4 +314,56 @@ body {
   font-size: 0.9rem;
   color: var(--fg);
   opacity: 0.8;
+}
+
+/* el texto de categoría ahora es un botón clicable */
+.category {
+  border: 0;
+  background: none;
+  color: #e84a4a;
+  font: inherit;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  border-radius: 0.4rem;
+}
+
+.catalog-toolbar > .container {
+  position: relative;
+} /* para anclar el popover */
+
+.category-popover {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%); /* centrado bajo el título */
+  margin-top: 0.5rem;
+  min-width: 220px;
+  max-height: 280px;
+  overflow: auto;
+  background: #0f1522;
+  border: 1px solid #24304a;
+  border-radius: 0.6rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  padding: 0.4rem;
+  z-index: 20;
+}
+
+.category-popover[hidden] {
+  display: none;
+}
+
+.category-option {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+.category-option:hover,
+.category-option.is-active {
+  background: rgba(255, 215, 0, 0.08);
+  outline: 1px solid rgba(255, 215, 0, 0.25);
 }

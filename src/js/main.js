@@ -1,5 +1,10 @@
 // src/js/main.js
-import { hydrateFromTMDB, renderCatalog, bindViewControls } from "./movies.js";
+import {
+  hydrateFromTMDB,
+  renderCatalog,
+  bindViewControls,
+  bindCategoryTrigger,
+} from "./movies.js";
 import logoUrl from "../asset/images/logo-1x.png";
 
 import "./utils/dom.js";
@@ -17,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const root = document.getElementById("root");
   renderCatalog(root);
   bindViewControls();
+  bindCategoryTrigger();
 });
 
 // activar item de navegación

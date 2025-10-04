@@ -8,42 +8,104 @@ const TMDB_TOKEN =
   "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhM2VkMTRiYTA2MGNkODI5OGYyZmM3NGJkNDBmOWYwNiIsIm5iZiI6MTc1NzI2Nzc3OC4wODQsInN1YiI6IjY4YmRjNzQyM2MyYjE2MmJhMjFmNTFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.AesW6OqgZVdnnpqq7E3JMsOi0JAGTHdIoNoryV8Ameo";
 
 let currentView = localStorage.getItem(VIEW_KEY) || "grid";
-let currentCategory = "Populares";
+let currentGenreId = null; // null = Populares
+let GENRES_MAP = {}; // id -> nombre
 
-// Catálogo actual
-export let movies = [];
+export let movies = []; // catálogo actual
+
+function getHeaders() {
+  return {
+    accept: "application/json",
+    Authorization: `Bearer ${TMDB_TOKEN}`,
+  };
+}
 
 // ============================
-// Llamada a la API TMDB (enriquecida)
+// Carga géneros y construye el popover del trigger
+// (el HTML tiene: #category-trigger y #category-popover)
+// ============================
+async function loadGenres(headers) {
+  const res = await fetch(
+    "https://api.themoviedb.org/3/genre/movie/list?language=es-ES",
+    { headers }
+  );
+  const json = await res.json();
+  GENRES_MAP = Object.fromEntries(
+    (json.genres || []).map((g) => [g.id, g.name])
+  );
+}
+
+function setCategoryLabel() {
+  const trigger = document.getElementById("category-trigger");
+  if (!trigger) return;
+  trigger.textContent = currentGenreId
+    ? GENRES_MAP[currentGenreId] || "Género"
+    : "Populares";
+}
+
+async function buildCategoryPopover() {
+  const pop = document.getElementById("category-popover");
+  if (!pop) return;
+
+  const options = [
+    { id: null, name: "Populares" },
+    ...Object.entries(GENRES_MAP).map(([id, name]) => ({
+      id: Number(id),
+      name,
+    })),
+  ];
+
+  pop.innerHTML = options
+    .map(
+      (opt) => `
+    <button class="category-option ${
+      String(opt.id) === String(currentGenreId) ? "is-active" : ""
+    }"
+            role="option" data-id="${opt.id ?? ""}">
+      ${opt.name}
+    </button>
+  `
+    )
+    .join("");
+}
+
+// ============================
+// Llamada a la API TMDB (con enriquecido básico)
 // ============================
 export async function hydrateFromTMDB() {
   try {
-    const headers = {
-      accept: "application/json",
-      Authorization: `Bearer ${TMDB_TOKEN}`,
-    };
+    const headers = getHeaders();
 
     // Config imágenes
     const cfg = await fetch("https://api.themoviedb.org/3/configuration", {
       headers,
     }).then((r) => r.json());
-
     const base =
       (cfg.images && (cfg.images.secure_base_url || cfg.images.base_url)) ||
       "https://image.tmdb.org/t/p/";
     const size = "w342";
 
-    // Descubrimiento (varias páginas)
+    // Cargar géneros si aún no están y preparar UI
+    if (!Object.keys(GENRES_MAP).length) await loadGenres(headers);
+    setCategoryLabel();
+    await buildCategoryPopover();
+
+    // Discover (con o sin género)
+    const baseUrl = new URL("https://api.themoviedb.org/3/discover/movie");
+    baseUrl.searchParams.set("include_adult", "false");
+    baseUrl.searchParams.set("language", "es-ES");
+    baseUrl.searchParams.set("sort_by", "popularity.desc");
+    if (currentGenreId)
+      baseUrl.searchParams.set("with_genres", String(currentGenreId));
+
     const pages = [1, 2, 3];
-    const all = [];
+    const baseList = [];
     for (const p of pages) {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&include_adult=false&language=es-ES&page=${p}`,
-        { headers }
-      );
+      baseUrl.searchParams.set("page", String(p));
+      const res = await fetch(baseUrl.toString(), { headers });
       if (!res.ok) throw new Error(`TMDB ${res.status}`);
       const { results } = await res.json();
-      all.push(
+      baseList.push(
         ...results.map((m) => ({
           id: m.id,
           title: m.title,
@@ -55,19 +117,10 @@ export async function hydrateFromTMDB() {
       );
     }
 
-    // Mapa de géneros
-    const genreList = await fetch(
-      "https://api.themoviedb.org/3/genre/movie/list?language=es-ES",
-      { headers }
-    ).then((r) => r.json());
-    const GENRES = Object.fromEntries(
-      (genreList.genres || []).map((g) => [g.id, g.name])
-    );
-
-    // Enriquecer detalles + créditos para los primeros N (optimiza peticiones)
-    const ENRICH_COUNT = Math.min(40, all.length);
+    // Enriquecido (overview, director, actores, géneros) para un lote moderado
+    const ENRICH_COUNT = Math.min(40, baseList.length);
     const detailResults = await Promise.allSettled(
-      all
+      baseList
         .slice(0, ENRICH_COUNT)
         .map((m) =>
           fetch(
@@ -78,9 +131,9 @@ export async function hydrateFromTMDB() {
     );
 
     const extraById = {};
-    detailResults.forEach((res) => {
-      if (res.status !== "fulfilled") return;
-      const d = res.value || {};
+    for (const dr of detailResults) {
+      if (dr.status !== "fulfilled") continue;
+      const d = dr.value || {};
       const director =
         (d.credits?.crew || []).find((c) => c.job === "Director")?.name || "";
       const actors = (d.credits?.cast || [])
@@ -94,10 +147,9 @@ export async function hydrateFromTMDB() {
         actors,
         category: categories,
       };
-    });
+    }
 
-    // Fusiona base + extras (resto sin extras usa géneros por id)
-    movies = all.map((m) => {
+    movies = baseList.map((m) => {
       const ex = extraById[m.id] || {};
       return {
         id: m.id,
@@ -111,51 +163,19 @@ export async function hydrateFromTMDB() {
         category:
           ex.category ||
           (m.genre_ids || [])
-            .map((id) => GENRES[id])
+            .map((id) => GENRES_MAP[id])
             .filter(Boolean)
             .join(", "),
       };
     });
-
-    // Persistimos vista actual
-    localStorage.setItem(VIEW_KEY, currentView);
-    console.log("Películas cargadas:", movies.length);
   } catch (e) {
-    console.warn("⚠️ No se pudo cargar TMDB, catálogo vacío.", e.message || e);
+    console.warn("TMDB falló:", e);
+    movies = [];
   }
 }
 
 // ============================
-// Toolbar (UI superior)
-// ============================
-function toolbarHTML() {
-  return `
-    <div class="catalog-toolbar">
-      <div class="catalog-toolbar__title">
-        Seleccione una categoría: <span class="category">${currentCategory}</span>
-      </div>
-      <div class="catalog-toolbar__controls">
-        <button class="viewbtn ${
-          currentView === "grid" ? "is-active" : ""
-        }" data-view="grid" aria-pressed="${
-    currentView === "grid"
-  }" title="Cuadrícula">
-          <i class="icon-grid"></i>
-        </button>
-        <button class="viewbtn ${
-          currentView === "list" ? "is-active" : ""
-        }" data-view="list" aria-pressed="${
-    currentView === "list"
-  }" title="Lista">
-          <i class="icon-list"></i>
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// ============================
-// Render de Cards (con summary, director, actors y categoría)
+// Tarjeta (usa las clases de tu SCSS)
 // ============================
 function cardHTML(m) {
   return `
@@ -185,73 +205,88 @@ function cardHTML(m) {
 }
 
 // ============================
-// Render completo del Catálogo (usa .catalog grid/list)
+// Render (solo dentro de #root, que ya es .catalog)
 // ============================
 export function renderCatalog(root) {
   root.classList.toggle("grid", currentView === "grid");
   root.classList.toggle("list", currentView === "list");
   root.innerHTML = movies.map(cardHTML).join("");
 }
-// Bind de los botones que ya existen en el HTML
+
+// ============================
+// Botones de vista (ya en HTML)
+// ============================
 export function bindViewControls() {
   const root = document.getElementById("root");
-  const btnGrid = document.getElementById("btn-grid");
-  const btnList = document.getElementById("btn-list");
+  const btnG = document.getElementById("btn-grid");
+  const btnL = document.getElementById("btn-list");
+  if (!root || !btnG || !btnL) return;
 
   const sync = () => {
-    btnGrid.setAttribute("aria-pressed", String(currentView === "grid"));
-    btnList.setAttribute("aria-pressed", String(currentView === "list"));
+    btnG.setAttribute("aria-pressed", String(currentView === "grid"));
+    btnL.setAttribute("aria-pressed", String(currentView === "list"));
     root.classList.toggle("grid", currentView === "grid");
     root.classList.toggle("list", currentView === "list");
     localStorage.setItem(VIEW_KEY, currentView);
   };
 
-  btnGrid.addEventListener("click", () => {
+  btnG.addEventListener("click", () => {
     currentView = "grid";
     sync();
   });
-  btnList.addEventListener("click", () => {
+  btnL.addEventListener("click", () => {
     currentView = "list";
     sync();
   });
-
-  sync(); // estado inicial
+  sync();
 }
 
 // ============================
-// Eventos de la Toolbar (toggle grid/list)
+// Trigger de categoría (clic en el texto rojo)
 // ============================
-function attachToolbarEvents(rootEl) {
-  const buttons = rootEl.querySelectorAll(".viewbtn");
-  const catalog = rootEl.querySelector(".catalog");
+export function bindCategoryTrigger() {
+  const trigger = document.getElementById("category-trigger");
+  const pop = document.getElementById("category-popover");
+  if (!trigger || !pop) return;
 
-  const syncButtons = () => {
-    buttons.forEach((b) => {
-      const pressed = b.dataset.view === currentView;
-      b.classList.toggle("is-active", pressed);
-      b.setAttribute("aria-pressed", String(pressed));
-    });
+  const open = async () => {
+    await buildCategoryPopover(); // asegura opciones frescas
+    trigger.setAttribute("aria-expanded", "true");
+    pop.hidden = false;
+  };
+  const close = () => {
+    trigger.setAttribute("aria-expanded", "false");
+    pop.hidden = true;
   };
 
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      currentView = btn.dataset.view;
-      localStorage.setItem(VIEW_KEY, currentView);
-      catalog.classList.toggle("grid", currentView === "grid");
-      catalog.classList.toggle("list", currentView === "list");
-      syncButtons();
-    });
+  trigger.addEventListener("click", () => (pop.hidden ? open() : close()));
+
+  document.addEventListener("click", (e) => {
+    if (!pop.hidden && !pop.contains(e.target) && e.target !== trigger) close();
   });
 
-  // estado inicial del contenedor
-  catalog.classList.toggle("grid", currentView === "grid");
-  catalog.classList.toggle("list", currentView === "list");
-  syncButtons();
+  pop.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".category-option");
+    if (!btn) return;
+
+    const idAttr = btn.dataset.id;
+    currentGenreId = idAttr === "" ? null : Number(idAttr);
+
+    setCategoryLabel();
+    close();
+
+    await hydrateFromTMDB();
+    renderCatalog(document.getElementById("root"));
+  });
+
+  // label inicial
+  setCategoryLabel();
 }
 
 // ============================
-// Cambiar categoría (si usas filtros luego)
+// (opcional) cambiar categoría programáticamente
 // ============================
-export function setCatalogCategory(name) {
-  currentCategory = name || currentCategory;
+export function setCatalogCategoryById(genreIdOrNull) {
+  currentGenreId = genreIdOrNull == null ? null : Number(genreIdOrNull);
+  setCategoryLabel();
 }
