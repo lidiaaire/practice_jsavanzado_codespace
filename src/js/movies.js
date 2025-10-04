@@ -1,18 +1,18 @@
-// ============================
-// movies.js  (versión final)
-// ============================
+// ESTADOS Y CONSTANTES
+// Añadir de themovie.db (https://www.themoviedb.org/) para que funcione la API
 
-// 👉 Token TMDB (el tuyo)
 const VIEW_KEY = "a3ed14ba060cd8298f2fc74bd40f9f06";
 const TMDB_TOKEN =
   "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhM2VkMTRiYTA2MGNkODI5OGYyZmM3NGJkNDBmOWYwNiIsIm5iZiI6MTc1NzI2Nzc3OC4wODQsInN1YiI6IjY4YmRjNzQyM2MyYjE2MmJhMjFmNTFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.AesW6OqgZVdnnpqq7E3JMsOi0JAGTHdIoNoryV8Ameo";
 
 let currentView = localStorage.getItem(VIEW_KEY) || "grid";
-let currentGenreId = null; // null = Populares
-let GENRES_MAP = {}; // id -> nombre
+let currentGenreId = null;
+let GENRES_MAP = {};
 
-export let movies = []; // catálogo actual
+export let movies = [];
 
+// UI/header
+// centra el Header y pone en rojo la categoria
 function getHeaders() {
   return {
     accept: "application/json",
@@ -20,10 +20,16 @@ function getHeaders() {
   };
 }
 
-// ============================
-// Carga géneros y construye el popover del trigger
-// (el HTML tiene: #category-trigger y #category-popover)
-// ============================
+function setCategoryLabel() {
+  const trigger = document.getElementById("category-trigger");
+  if (!trigger) return;
+  trigger.textContent = currentGenreId
+    ? GENRES_MAP[currentGenreId] || "Género"
+    : "Populares";
+}
+
+// CARGA GENEROS Y LOS GUARDA EN GENRES_MAP
+// 1. Hace la llamada a TMDB para obtener los generos
 async function loadGenres(headers) {
   const res = await fetch(
     "https://api.themoviedb.org/3/genre/movie/list?language=es-ES",
@@ -35,14 +41,7 @@ async function loadGenres(headers) {
   );
 }
 
-function setCategoryLabel() {
-  const trigger = document.getElementById("category-trigger");
-  if (!trigger) return;
-  trigger.textContent = currentGenreId
-    ? GENRES_MAP[currentGenreId] || "Género"
-    : "Populares";
-}
-
+//2. Pinta el menu desplegable con los generos establecidos
 async function buildCategoryPopover() {
   const pop = document.getElementById("category-popover");
   if (!pop) return;
@@ -69,14 +68,14 @@ async function buildCategoryPopover() {
     .join("");
 }
 
-// ============================
-// Llamada a la API TMDB (con enriquecido básico)
-// ============================
+// IMPORTANTE: Se llama antes de renderrizar para que el menu este listo cuando el usuario lo pulse
+
+// CARGA PELICULAS DE LA TMDB (api.themoviedb.org)
 export async function hydrateFromTMDB() {
   try {
     const headers = getHeaders();
 
-    // Config imágenes
+    // 1. Configura la imagen
     const cfg = await fetch("https://api.themoviedb.org/3/configuration", {
       headers,
     }).then((r) => r.json());
@@ -85,12 +84,12 @@ export async function hydrateFromTMDB() {
       "https://image.tmdb.org/t/p/";
     const size = "w342";
 
-    // Cargar géneros si aún no están y preparar UI
-    if (!Object.keys(GENRES_MAP).length) await loadGenres(headers);
-    setCategoryLabel();
-    await buildCategoryPopover();
+    // 2. Carga generos
+    if (!Object.keys(GENRES_MAP).length) await loadGenres(headers); // rellena GENRES_MAP
+    setCategoryLabel(); // Pone el texto en rojo de la categoria
+    await buildCategoryPopover(); // Crea el menu de las opciones
 
-    // Discover (con o sin género)
+    // 3. Discover (con o sin género) usa las URL + parámetros adecuados
     const baseUrl = new URL("https://api.themoviedb.org/3/discover/movie");
     baseUrl.searchParams.set("include_adult", "false");
     baseUrl.searchParams.set("language", "es-ES");
@@ -105,6 +104,8 @@ export async function hydrateFromTMDB() {
       const res = await fetch(baseUrl.toString(), { headers });
       if (!res.ok) throw new Error(`TMDB ${res.status}`);
       const { results } = await res.json();
+
+      // 4. Mapea la informacion basica de cada película
       baseList.push(
         ...results.map((m) => ({
           id: m.id,
@@ -117,7 +118,7 @@ export async function hydrateFromTMDB() {
       );
     }
 
-    // Enriquecido (overview, director, actores, géneros) para un lote moderado
+    // 5. Detalla (resumen, director, actores, categorias)
     const ENRICH_COUNT = Math.min(40, baseList.length);
     const detailResults = await Promise.allSettled(
       baseList
@@ -130,6 +131,7 @@ export async function hydrateFromTMDB() {
         )
     );
 
+    // 6. Construye el array final de movies
     const extraById = {};
     for (const dr of detailResults) {
       if (dr.status !== "fulfilled") continue;
@@ -149,6 +151,7 @@ export async function hydrateFromTMDB() {
       };
     }
 
+    // 7. Mezcla la info básica y la extra
     movies = baseList.map((m) => {
       const ex = extraById[m.id] || {};
       return {
@@ -174,9 +177,8 @@ export async function hydrateFromTMDB() {
   }
 }
 
-// ============================
-// Tarjeta (usa las clases de tu SCSS)
-// ============================
+// PLANTILLA DE CADA TARJETA
+
 function cardHTML(m) {
   return `
     <article class="movie" data-id="${m.id}">
@@ -204,18 +206,16 @@ function cardHTML(m) {
   `;
 }
 
-// ============================
-// Render (solo dentro de #root, que ya es .catalog)
-// ============================
+// RENDER DEL CATALOGO.
+// Aplica grid o list en el #root y vuelca todas las tarjetas dentro
 export function renderCatalog(root) {
   root.classList.toggle("grid", currentView === "grid");
   root.classList.toggle("list", currentView === "list");
   root.innerHTML = movies.map(cardHTML).join("");
 }
 
-// ============================
-// Botones de vista (ya en HTML)
-// ============================
+// BOTONES DE VISTA DE GRID O LIST
+
 export function bindViewControls() {
   const root = document.getElementById("root");
   const btnG = document.getElementById("btn-grid");
@@ -241,9 +241,8 @@ export function bindViewControls() {
   sync();
 }
 
-// ============================
-// Trigger de categoría (clic en el texto rojo)
-// ============================
+// CLICK EN EL TEXTO ROJO DE CATEGORIA
+// Muestra el popover, permite elegir categoria y recarga el catalogo
 export function bindCategoryTrigger() {
   const trigger = document.getElementById("category-trigger");
   const pop = document.getElementById("category-popover");
@@ -280,13 +279,5 @@ export function bindCategoryTrigger() {
   });
 
   // label inicial
-  setCategoryLabel();
-}
-
-// ============================
-// (opcional) cambiar categoría programáticamente
-// ============================
-export function setCatalogCategoryById(genreIdOrNull) {
-  currentGenreId = genreIdOrNull == null ? null : Number(genreIdOrNull);
   setCategoryLabel();
 }

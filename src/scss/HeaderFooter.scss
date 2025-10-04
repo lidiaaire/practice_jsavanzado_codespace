@@ -3,7 +3,7 @@
   --header-font-size: 12px;
   --header-color: #fff;
   --header-bg: #1a1d24;
-  --accent: #cc2942; /* rojo filmax */
+  --accent: #cc2942;
 }
 
 /* ===== HEADER ===== */
@@ -30,7 +30,7 @@
   padding: 0 24px;
 }
 
-/* Logo: <a class="logo"><img> */
+/* LOGO FILMAX */
 .logo img,
 img.logo {
   max-height: 30px;
@@ -38,9 +38,9 @@ img.logo {
   display: block;
 }
 
-/* ===== MENÚ (centro) ===== */
+/* ===== MENÚ ===== */
 .menu {
-  flex: 1; /* ocupa el espacio central */
+  flex: 1;
   display: flex;
   justify-content: center;
 }
@@ -48,11 +48,11 @@ img.logo {
 .menu ul {
   display: flex;
   align-items: center;
-  justify-content: center; /* centra el texto */
+  justify-content: center;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 28px; /* espacio uniforme entre items y "/" */
+  gap: 28px;
 }
 
 .menu li {
@@ -103,7 +103,6 @@ img.logo {
   display: inline-block;
 }
 
-/* Botón/liga de icono sin fondo */
 .icons button,
 .icons a {
   background: transparent;
@@ -128,7 +127,7 @@ img.logo {
   fill: currentColor;
 }
 
-/* ===== Redes sociales ===== */
+/* ===== RS ===== */
 .RS ul,
 .RS ul li {
   list-style: none;
@@ -154,7 +153,7 @@ img.logo {
   color: var(--accent);
 }
 
-/* ===== Lupa (si usas .search .icon) ===== */
+/* ===== Lupa  ===== */
 .header .search button.icon {
   background: transparent !important;
   border: 0 !important;

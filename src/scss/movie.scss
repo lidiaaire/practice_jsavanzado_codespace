@@ -241,10 +241,10 @@ body {
 .movie__poster {
   display: block;
   width: 100%;
-  height: auto; /* <- sin altura fija */
-  aspect-ratio: auto; /* <- usamos la del propio poster */
-  object-fit: contain; /* <- se ve entero */
-  background: #0a0d14; /* leve fondo para márgenes laterales del poster */
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  background: #0a0d14;
 }
 .movie__body {
   padding: 0.8rem 0.9rem 1rem;
@@ -282,7 +282,6 @@ body {
   padding: 0.2rem 0.8rem;
 }
 
-/* === NUEVO: texto enriquecido === */
 .movie__label {
   font-weight: 700;
 }
@@ -316,7 +315,7 @@ body {
   opacity: 0.8;
 }
 
-/* el texto de categoría ahora es un botón clicable */
+/* POPOVER DE CATEGORÍAS */
 .category {
   border: 0;
   background: none;
@@ -329,13 +328,13 @@ body {
 
 .catalog-toolbar > .container {
   position: relative;
-} /* para anclar el popover */
+}
 
 .category-popover {
   position: absolute;
   top: 100%;
   left: 50%;
-  transform: translateX(-50%); /* centrado bajo el título */
+  transform: translateX(-50%);
   margin-top: 0.5rem;
   min-width: 220px;
   max-height: 280px;
